@@ -1,6 +1,7 @@
 from typing import NamedTuple
 import networkx as nx
 from queues import Queue
+from collections import deque
 
 class City(NamedTuple):
     name: str
@@ -34,7 +35,7 @@ def breadth_first_traverse(graph, source):
     queue = Queue(source)
     visited = {source}
     while queue:
-        yield (node := queue.dequeue())
+        yield node := queue.dequeue()
         for neighbor in graph.neighbors(node):
             if neighbor not in visited:
                 visited.add(neighbor)
@@ -61,3 +62,16 @@ def shortest_path(graph, source, destination, order_by=None):
                 previous[neighbor] = node
                 if neighbor == destination:
                     return retrace(previous, source, destination)
+
+def retrace(previous, source, destination):
+    path = deque()
+
+    current = destination
+    while current != source:
+        path.appendleft(current)
+        current = previous.get(current)
+        if current is None:
+            return None
+
+    path.appendleft(source)
+    return list(path)
